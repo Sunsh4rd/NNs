@@ -1,0 +1,37 @@
+{
+    "vertices": [
+        "A",
+        "D",
+        "E",
+        "B",
+        "F",
+        "C"
+    ],
+    "edges": [
+        {
+            "source": "A",
+            "dest": "D",
+            "order": "1"
+        },
+        {
+            "source": "D",
+            "dest": "E",
+            "order": "1"
+        },
+        {
+            "source": "C",
+            "dest": "B",
+            "order": "1"
+        },
+        {
+            "source": "B",
+            "dest": "E",
+            "order": "2"
+        },
+        {
+            "source": "F",
+            "dest": "E",
+            "order": "3"
+        }
+    ]
+}
