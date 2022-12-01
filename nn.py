@@ -207,7 +207,8 @@ def main():
             rg = Graph.from_file(args.ig)
             with open(f'input_files/{args.op}', 'r', encoding='utf-8') as f:
                 data = f.read()
-                vert_op_list = re.findall(r'\w : [*+\d]|\w : exp', data)
+                vert_op_list = re.findall(
+                    r'\w : [*+]|\w : exp|\w : \d*', data)
                 if len(vert_op_list) != len(data.split('\n')):
                     print('Ошибка во входном файле!')
                     exit()
