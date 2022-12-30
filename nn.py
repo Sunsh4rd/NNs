@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import json
 import math
 import re
+import sys
 
 
 @dataclass(repr=True)
@@ -184,6 +185,7 @@ class Graph:
 
         return fun_values
 
+
 class Matrix:
 
     def __init__(self, matrix: list[list[int]], vector: list[int]) -> None:
@@ -191,28 +193,64 @@ class Matrix:
         self.vector = vector
 
     @staticmethod
-    def from_file(path_vector: str, path_matrix: str) -> list[int]:
-        with open(path_vector,'r',encoding='utf-8') as f:
-            data = f.read().split()
-        vector = [int(x) for x in data]
-        
-        return vector
+    def from_file(path_vector: str, path_matrix: str) -> 'Matrix':
+        with open(path_vector, 'r', encoding='utf-8') as f:
+            vector_data = f.read().split()
+        vector = [int(x) for x in vector_data]
+        with open(path_matrix, 'r', encoding='utf-8') as f:
+            matrix_data = f.readlines()
+        matrix = []
+        idx = 0
+        length = len(vector)
+        for line in matrix_data:
+            idx += 1
+            line = line.replace('[', ' ').replace(']', ' ')[1:-2].split('   ')
+            tmp = []
+            for x in line:
+                x = x.split(' ')
+                try:
+                    x = [int(i) for i in x]
+                    tmp.append(x)
+                except ValueError:
+                    print(f'Ошибка во входном файле в строке {idx}')
+                    return None
+                if len(x) != length:
+                    print(
+                        f'Не совпадает число компонент нейронов в слоях {idx - 1} - {idx}')
+                    return None
+            length = len(line)
+            matrix.append([tmp])
 
+        return Matrix(matrix, vector)
+
+    def get_network(self):
+        new_matrix = []
+
+        for layer in self.matrix:
+            tmp = []
+            for x in layer:
+                for neuron in x:
+                    value = 0
+                    for i in range(len(self.vector)):
+                        value += neuron[i] * self.vector[i]
+                    value /= (1 + abs(value))
+                    tmp.append(value)
+                new_matrix.append(tmp)
+                self.vector = tmp
+        return new_matrix
 
 
 def main():
-
-    print(Matrix.from_file('input_files/vector.txt','input_files/matrix.txt'))
-
     parser = argparse.ArgumentParser()
-    parser.add_argument('-t', choices=['1', '2', '3','4'], required=True)
+    parser.add_argument('-t', choices=['1', '2', '3', '4'], required=True)
     parser.add_argument('--ig', default='graph.txt')
     parser.add_argument('--og', default='graph.json')
     parser.add_argument('--of', default='function.txt')
     parser.add_argument('--op', default='operations.txt')
     parser.add_argument('--im', default='matrix.txt')
     parser.add_argument('--iv', default='vector.txt')
-    parser.add_argument('--om', default='matrix.txt')
+    parser.add_argument('--om', default='matrix.json')
+    parser.add_argument('--ow', default='output.txt')
     args = parser.parse_args()
 
     match args.t:
@@ -241,6 +279,21 @@ def main():
             function_value = rg.get_function_value_by_graph(ops)
             with open(f'output_files/{args.of}', 'w', encoding='utf-8') as f:
                 f.write(' '.join(str(v) for v in function_value))
+        case '4':
+            mm = Matrix.from_file(
+                f'input_files/{args.iv}', f'input_files/{args.im}')
+            if mm:
+                with open(f'output_files/{args.om}', 'w', encoding='utf-8') as f:
+                    json.dump(
+                        {
+                            'network': {
+                                'layers': mm.matrix
+                            }
+                        }, f, indent=4
+                    )
+                results = mm.get_network()
+                with open(f'output_files/{args.ow}','w',encoding='utf-8') as f:
+                    f.write(' '.join(str(x) for x in results[-1]))
 
 
 if __name__ == '__main__':
