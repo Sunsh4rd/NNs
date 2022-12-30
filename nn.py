@@ -184,14 +184,35 @@ class Graph:
 
         return fun_values
 
+class Matrix:
+
+    def __init__(self, matrix: list[list[int]], vector: list[int]) -> None:
+        self.matrix = matrix
+        self.vector = vector
+
+    @staticmethod
+    def from_file(path_vector: str, path_matrix: str) -> list[int]:
+        with open(path_vector,'r',encoding='utf-8') as f:
+            data = f.read().split()
+        vector = [int(x) for x in data]
+        
+        return vector
+
+
 
 def main():
+
+    print(Matrix.from_file('input_files/vector.txt','input_files/matrix.txt'))
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('-t', choices=['1', '2', '3'], required=True)
+    parser.add_argument('-t', choices=['1', '2', '3','4'], required=True)
     parser.add_argument('--ig', default='graph.txt')
     parser.add_argument('--og', default='graph.json')
     parser.add_argument('--of', default='function.txt')
     parser.add_argument('--op', default='operations.txt')
+    parser.add_argument('--im', default='matrix.txt')
+    parser.add_argument('--iv', default='vector.txt')
+    parser.add_argument('--om', default='matrix.txt')
     args = parser.parse_args()
 
     match args.t:
