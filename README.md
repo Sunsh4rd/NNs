@@ -18,4 +18,5 @@
     > python nn.py -t 2 --ig ingraph.txt --og outgraph.json --of outfunction.txt
 
     > python nn.py -t 3 --ig ingraph.txt --og outgraph.json --op inoperations.txt --of outfunction.txt
-    
+
+Добавлено задание 4.
